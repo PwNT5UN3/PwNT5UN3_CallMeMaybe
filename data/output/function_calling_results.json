@@ -61,9 +61,9 @@
     "prompt": "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS",
     "name": "fn_substitute_string_with_regex",
     "args": {
-      "source_string": ", ",
-      "regex": ", ",
-      "replacement": ", "
+      "source_string": "Hello 34 I'm 233 years old",
+      "regex": "/\\d+/g",
+      "replacement": "NUMBERS"
     }
   },
   {
@@ -71,7 +71,7 @@
     "name": "fn_substitute_string_with_regex",
     "args": {
       "source_string": "Programming is fun",
-      "regex": "[aeiou]",
+      "regex": "/[aeiou]/g",
       "replacement": "*"
     }
   },
@@ -79,9 +79,9 @@
     "prompt": "Substitute the word 'cat' with 'dog' in 'The cat sat on the mat with another cat'",
     "name": "fn_substitute_string_with_regex",
     "args": {
-      "source_string": ", ",
-      "regex": ", ",
-      "replacement": ", "
+      "source_string": "The cat sat on the mat with another cat",
+      "regex": "/cat/",
+      "replacement": "dog"
     }
   }
 ]

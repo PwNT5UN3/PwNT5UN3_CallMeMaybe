@@ -19,7 +19,7 @@ class ReturnType(BaseModel):
 
 class FunctionDefinition(BaseModel):
     name: str
-    description: str
+    # description: str
     parameters: dict[str, Parameter]
     returns: ReturnType
 
@@ -119,7 +119,7 @@ class SchemaCompiler:
 
     def compile(self) -> State:
         start = State()
-        prefix = build_literal(start, b'{"fn_name":"}')
+        prefix = build_literal(start, b'{"fn_name":"')
         final_accept_states = []
         for fn in self.functions:
             fn_name = fn.name
@@ -228,6 +228,7 @@ def generate_constrained(llm: Small_LLM_Model, prompt_text: str, schema_start: S
         next_token_id = int(torch.argmax(token_mask).item())
         mask.advance(next_token_id)
         generated_ids.append(next_token_id)
+        print(llm._decode(generated_ids))
     result = str(llm._decode(generated_ids))
     return result
 
@@ -295,7 +296,7 @@ def main() -> None:
             parsed_json = json.loads(response)
             print(prompt_text)
             print(parsed_json)
-            final_obj = {"prompt": prompt_text, "name": str(parsed_json["fn_name"]).split("}")[1], "args": parsed_json["args"]}
+            final_obj = {"prompt": prompt_text, "name": str(parsed_json["fn_name"]), "args": parsed_json["args"]}
             results.append(final_obj)
         except Exception as e:
             print(e)
