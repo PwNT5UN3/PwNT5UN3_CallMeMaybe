@@ -119,7 +119,7 @@ class SchemaCompiler:
 
     def compile(self) -> State:
         start = State()
-        prefix = build_literal(start, b'{"name":}"')
+        prefix = build_literal(start, b'{"fn_name":"}')
         final_accept_states = []
         for fn in self.functions:
             fn_name = fn.name
@@ -296,7 +296,7 @@ def main() -> None:
             print(prompt_text)
             print(parsed_json)
             print()
-            final_obj = {"prompt": prompt_text, "name": parsed_json["name"], "args": parsed_json["args"]}
+            final_obj = {"prompt": prompt_text, "fn_name": parsed_json["fn_name"], "args": parsed_json["args"]}
             results.append(final_obj)
         except Exception as e:
             print(e)
