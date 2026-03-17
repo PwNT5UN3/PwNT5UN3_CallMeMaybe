@@ -23,7 +23,10 @@ class SchemaCompiler:
                     current = self._chain_literal(current, b",")
                 arg_key = f'"{arg_name}":'.encode("utf-8")
                 current = self._chain_literal(current, arg_key)
-                arg_type = args_types.get(arg_name).type
+                arg_type_raw = args_types.get(arg_name)
+                if arg_type_raw is None:
+                    raise ValueError("something unexpected happened")
+                arg_type = arg_type_raw.type
                 current = self._chain_type(current, arg_type)
             end_states = self._chain_literal(current, b"}}")
             final_accept_states.extend(end_states)

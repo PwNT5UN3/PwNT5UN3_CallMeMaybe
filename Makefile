@@ -21,6 +21,10 @@ install:
 	. ./.venv/bin/activate; \
 	uv pip install mypy; \
 	uv pip install flake8; \
+	uv pip install torch; \
+	uv pip install transformers; \
+	uv pip install pydantic; \
+	uv pip install accelerate;
 
 run:
 	@echo $(ARGS)
@@ -34,7 +38,7 @@ run:
 	'
 
 debug:
-	uv run python -m pdb main.py $(ARGS)
+	uv run python -m pdb src/__main__.py
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +
@@ -45,13 +49,14 @@ clean:
 	find . -name "*.pyo" -delete
 
 lint:
-	uv run flake8 ./src/*.py
-	uv run mypy . --warn-return-any \
+	uv run flake8 src/*.py
+	uv run mypy src/ --warn-return-any \
 	--warn-unused-ignores \
 	--ignore-missing-imports \
 	--disallow-untyped-defs \
-	--check-untyped-defs
+	--check-untyped-defs \
+	--follow-imports=silent
 
 lint-strict: 
-	uv run flake8 ./src/*.py
-	uv run mypy . --strict
+	uv run flake8 src/*.py
+	uv run mypy src/ --strict --follow-imports=silent
