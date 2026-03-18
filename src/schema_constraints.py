@@ -4,10 +4,13 @@ from src.state_cache import consume_bytes
 
 
 class SchemaCompiler:
+    """Specifies the rough structure for the LLM to fill out"""
     def __init__(self, functions: AllFunctions):
+        """constructor which loads availabale functions"""
         self.functions = functions.funcs
 
     def compile(self) -> State:
+        """Builds the structure"""
         start = State()
         prefix = build_literal(start, b'{"fn_name":"')
         final_accept_states = []
@@ -36,6 +39,7 @@ class SchemaCompiler:
 
     def _chain_literal(
             self, states: list[State], literal_bytes: bytes) -> list[State]:
+        """builds a state chain for a literal"""
         new_states = []
         for s in states:
             new_states.append(build_literal(s, literal_bytes))
@@ -43,6 +47,7 @@ class SchemaCompiler:
 
     def _chain_type(
             self, states: list[State], arg_type: str | None) -> list[State]:
+        """builds a state chain for a parameter type"""
         new_states = []
         for s in states:
             if arg_type == "number":
@@ -55,7 +60,9 @@ class SchemaCompiler:
 
 
 class ConstraintMask:
+    """Serves as the constraing mask"""
     def __init__(self, start: State, vocab: dict[int, bytes]) -> None:
+        """builds the mask"""
         self.current: frozenset[State] = frozenset({start})
         self.vocab = vocab
         self.vocab_size = len(vocab)
@@ -64,6 +71,9 @@ class ConstraintMask:
         self._valid_cache: dict[frozenset[State], list[int]] = {}
 
     def get_valid_tokens(self) -> list[int]:
+        """
+        returns a list of valid next tokens as specified by the State system
+        """
         if self.current in self._valid_cache:
             return self._valid_cache[self.current]
         valid_ids = []
@@ -77,9 +87,14 @@ class ConstraintMask:
         return valid_ids
 
     def advance(self, token_id: int) -> None:
+        """
+        builds the states neccessary for the chosen token
+        for the next generation
+        """
         token_bytes = self.vocab.get(token_id, b"")
         if token_bytes:
             self.current = consume_bytes(self.current, token_bytes)
 
     def finished(self) -> bool:
+        """Stops generation once response if done"""
         return any(state.accept for state in self.current)

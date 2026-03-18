@@ -34,7 +34,7 @@ run:
 	fi
 	@sh -c '\
 		. ./.venv/bin/activate; \
-		uv run python -m src \
+		uv run python -m src $(ARGS);\
 	'
 
 debug:

@@ -11,6 +11,8 @@ from src.state_cache import State
 
 
 def get_vocab_strs(path: str) -> dict[int, bytes]:
+    """creates a token cache of significant tokens
+    mapping to ascii and latin-1 characters"""
     with open(path, "r") as vocab_file:
         vocab = json.load(vocab_file)
     raw_bytes = (list(range(ord("!"), ord("~") + 1))
@@ -36,6 +38,9 @@ def get_vocab_strs(path: str) -> dict[int, bytes]:
 def generate_constrained(
     llm: Small_LLM_Model, prompt_text: str, schema_start: State,
         vocab: dict[int, bytes], max_tokens: int = 100) -> str:
+    """
+    Generates a response to the prompt while making use of the constrining mask
+    """
     input_ids = llm._encode(prompt_text).tolist()
     input_ids = [item for sublist in input_ids for item in sublist]
     mask = ConstraintMask(schema_start, vocab)
@@ -59,6 +64,8 @@ def generate_constrained(
 
 
 def main() -> None:
+    """The main Wrapper
+    handling parsing, generation looping and output file creation"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--functions_definition',

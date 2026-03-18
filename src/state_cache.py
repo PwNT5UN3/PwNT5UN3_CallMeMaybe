@@ -1,10 +1,13 @@
 class State:
+    """Defines a single DFA state"""
     def __init__(self) -> None:
+        """creates the state"""
         self.transitions: dict[int, list["State"]] = {}
         self.default_transitions: list[tuple["State", set[int]]] = []
         self.accept: bool = False
 
     def add_transition(self, byte_val: int, next_: "State") -> None:
+        """Adds a valid follow-up state"""
         if byte_val not in self.transitions:
             self.transitions[byte_val] = []
         self.transitions[byte_val].append(next_)
@@ -12,6 +15,9 @@ class State:
     def add_default_transition(
             self, next_: "State", exclude_bytes: set[int] | None = None
             ) -> None:
+        """
+        Adds a collection of follow-up states for if no transition is given
+        """
         exclude_set = set(exclude_bytes) if exclude_bytes else set()
         self.default_transitions.append((next_, exclude_set))
 
@@ -20,6 +26,8 @@ _CONSUME_CACHE: dict[tuple[frozenset["State"], int], frozenset["State"]] = {}
 
 
 def consume_byte(states: frozenset["State"], byte: int) -> frozenset["State"]:
+    """retrieves a state corresponding to a byte from the cache if it exists,
+    otherwise it stores the state"""
     key = (states, byte)
     if key in _CONSUME_CACHE:
         return _CONSUME_CACHE[key]
@@ -38,6 +46,7 @@ def consume_byte(states: frozenset["State"], byte: int) -> frozenset["State"]:
 
 def consume_bytes(
         states: frozenset["State"], byte_seq: bytes) -> frozenset["State"]:
+    """automates consumption for multiple bytes"""
     current = states
     for byte in byte_seq:
         current = consume_byte(current, byte)
@@ -47,6 +56,7 @@ def consume_bytes(
 
 
 def build_literal(state: "State", literal_bytes: bytes) -> "State":
+    """Adds state chains for literals"""
     current = state
     for byte in literal_bytes:
         nxt = State()
@@ -56,6 +66,7 @@ def build_literal(state: "State", literal_bytes: bytes) -> "State":
 
 
 def build_number(state: "State") -> "State":
+    """Adds state chains for numbers"""
     first_digit = State()
     state.add_transition(ord("-"), first_digit)
     digit_loop = State()
@@ -75,6 +86,7 @@ def build_number(state: "State") -> "State":
 
 
 def build_string(state: "State") -> "State":
+    """Adds state chains for strings"""
     in_str = State()
     state.add_transition(ord('"'), in_str)
     end_state = State()
